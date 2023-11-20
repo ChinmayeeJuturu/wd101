@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Registration Form</title>
+    <style>
+        input#name:invalid:focus{
+            border: 1px solid red;
+        }
+        input#email:invalid:focus{
+            border: 1px solid red;
+        }
+        input#password:invalid:focus{
+            border: 1px solid red;
+        }
+    </style>
+</head>
+<body> 
+    <div class="relative flex min-h-screen flex-col justify-center overflow-hidden py-6 bg-gray-50">
+        <div 
+          class="relative bg-white px-6 pt-5 pb-5 shadow-xl ring-1 ring-gray-900/5 sm:mx-auto sm:max-w-lg sm:rounded-lg sm:px-10">
+          <div class="mx-auto max-w-md">
+            <h2 class="text-3xl text-center font-bold leading-tight">
+                Registration Form
+            </h2>
+            <div class="divide-y divide-gray-300/50">
+                <div class="space-y-6 py-8 text-base leading-7 text-gray-600">
+                    <form id="user_form ">
+                        <label for="name" class="text-md w-40 inline-block font-medium leading-5 text-gray-700">
+                            Name
+                        </label>
+                        <input required type="text" id="name" name="name"
+                            class="bg-gray-100 inline-block rounded-lg shadow-md px-4 py-3 mb-5 text-base leading-6 placeholder-gray-500"
+                            placeholder="Enter full name"><br>
+                        <label for="email" class="text-md w-40 inline-block font-medium leading-5 text-gray-700">
+                            Email
+                        </label>
+                        <input required type="email" id="email" name="email"
+                            class="bg-gray-100 inline-block rounded-lg shadow-md px-4 py-3 mb-5 text-base leading-6 placeholder-gray-500"
+                            placeholder="Enter email"><br>
+                        <label for="password" class="text-md w-40 inline-block font-medium leading-5 text-gray-700">
+                            Password
+                        </label>
+                        <input required type="password" id="password" name="password"
+                            class="bg-gray-100 inline-block rounded-lg shadow-md px-4 py-3 mb-5 text-base leading-6 placeholder-gray-500"
+                            placeholder="Enter password"><br>
+                        <label for="dob" class="text-md w-40 inline-block font-medium leading-5 text-gray-700">
+                            Date of Birth
+                        </label>
+                        <input required type="date" id="dob" name="dob"
+                            class="bg-gray-100 inline-block rounded-lg shadow-md px-4 py-3 mb-5 text-base leading-6 placeholder-gray-500"
+                            placeholder="Enter dob" required min="09-11-1967" max="09-11-2004"><br>
+                        <label for="acceptTerms" class="text-md w-40 inline-block font-medium leading-5 text-grey-700">
+                            Accept Terms&Conditions
+                        </label>
+                        <input  required type="checkbox" id="acceptTerms" name="acceptTerms"
+                            class="bg-gray-100 inline-block rounded-lg shadow-md px-4 py-3 mb-5 text-base leading-6 placeholder-gray-500"><br>
+                        <button type="submit" id="submit" 
+                            class="w-fit rounded-lg shadow-lg px-8 py-4 bg-green-500 text-white hover:bg-green-500 focus:outline-none" >
+                            Submit
+                            
+                                                   
+                        </button>
+                           
+
+                    </form>
+                </div>
+            </div>
+          </div>
+                
+        </div>
+    
+    <div 
+    class="relative bg-white px-6 mt-5 pt-10 pb-8 shadow-xl ring-1 ring-gray-900/5 sm:mx-auto sm:rounded-lg sm:px-10">
+        <div class="mx-auto">
+            <h2 class="text-3xl text-center font-bold leading-tight">Entries</h2>
+            <div class="divide-y divide-gray-300/50" id="user-entries"></div>
+        </div>
+    </div>
+    </div>
+    
+    <script> src="index.js"</script>
+    <script> 
+     const dobInput = document.getElementById("dob");
+            const selectedDate = new Date(dobInput.value);
+
+            // Calculate age
+            const today = new Date();
+            const age = today.getFullYear() - selectedDate.getFullYear();
+
+            // Check if age is between 18 and 55
+            if (age >= 18 && age <= 55) {
+                alert("Date of birth is valid.");
+            } else {
+                alert("Date of birth must be between 18 and 55 years old.");
+            }
+    </script>
+    <script>
+        const express = require('express');
+const bodyParser = require('body-parser');
+
+const app = express();
+const port = 192.168.1.62;
+
+app.use(bodyParser.json());
+
+app.post('/submit-form', (req, res) => {
+  // Assuming your form data is sent as JSON in the request body
+  const formData = req.body;
+
+  // Log the received data (you can save it to a database or perform other actions here)
+  console.log('Received form data:', formData);
+
+  // Send a response back to the client
+  res.json({ message: 'Form data received successfully!' });
+});
+
+app.listen(port, () => {
+  console.log(`Server is listening at http://localhost:${port}`);
+});
+
+    </script>
+    <!-- Add this script tag to the head of your HTML document -->
+<script>
+    const userForm = document.getElementById("user-form");
+  
+    const saveUserForm = async (event) => {
+      event.preventDefault();
+  
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const dob = document.getElementById("dob").value;
+      const acceptedTermsAndConditions = document.getElementById("acceptTerms").checked;
+  
+      const entry = {
+        name,
+        email,
+        password,
+        dob,
+        acceptedTermsAndConditions,
+      };
+  
+      try {
+        const response = await fetch('http://localhost:/192.168.1.62 submit-form', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(entry),
+        });
+  
+        if (response.ok) {
+          console.log('Form data submitted successfully!');
+          // You can handle success actions here
+        } else {
+          console.error('Failed to submit form data');
+        }
+      } catch (error) {
+        console.error('Error submitting form data:', error);
+      }
+    };
+  
+    userForm.addEventListener("submit", saveUserForm);
+  </script>
+  
+</body>
+</html>
+ 
+
