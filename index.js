@@ -1,58 +1,79 @@
-let userForm = document.getElementById ("user-form");
-const retrieveEntries = ()=> {
-    let entries=localStorage.getItem("user-entries");
-    if(entries){
-        entries=JSON.parse(entries);
-    }else{
-        entries=[];    }
-    return entries;
+const registrationForm=document.getElementById('registration-form');
+const userDataTable=document.getElementById('user-data');
+const userDataTableBody=userDataTable.querySelector('tbody');
+const dobInput=document.getElementById('dob');
+const dobError=document.getElementById('dobError');
+window.addEventListener('load',()=> {
+    updateUserDataTable();
+});
+registrationForm.addEventListener('submit',(event)=>{
+    event.preventDefault();
+    const userData={
+        name:document.getElementById('name').value,
+        email:document.getElementById('email').value,
+        password:document.getElementById('password').value,
+        dob:document.getElementById('dob').value,
+        terms:document.getElementById('terms').checked
+    };
+    if (!validateUserData(userData)){
+        const errorMessage=document.createElement('p');
+        errorMessagetextContent='Value must be 09/11/1967 or later';
+        errorMessage.classList.add('error-message');
+        const dateField=document.getElementById('dob');
+        dateField.psrentNode.appendChild(errorMessage);
+    }
+    else{
+        saveUserData(userData);
+        updateUserDataTable();
+        clearForm();
+    }
+    
+});
+function validateUserData(userData){
+    const minAge=18;
+    const maxAge=55;
+    const today=new Date();
+    const birthDate=new Date(userData.dob);
+    const age=today.getFullYear()-birthDate.getFullYear();
+    if(age<minAge||age>maxAge){
+        return false;
+    }
+    return true;
 }
-let userEntries=retrieveEntries();
-const displayEntries = () => {
-    const entries=retrieveEntries();
+function saveUserData(userData)
+{
+    const existingUserData=JSON.parse(localStorage.getItem('userList')) ||[];
+    existingUserData.push(userData);
+    localStorage.setItem('userList',JSON.stringify(existingUserData));
+}
+function updateUserDataTable()
+{
+    userDataTableBody.innerHTML='';
+    const userList=JSON.parse(localStorage.getItem('userList')) ||[];
+    userList.forEach((userData)=> {
+        const userDataRow=createUserDataTableRow(userData);
+        userDataTableBody.appendChild(userDataRow);
+    });
+    if (userList.length>0){
+        userDataTable.classList.remove('hidden');
 
-const tableEntries=entries.map((entry)=>{
-    const nameCell=<td class='border px-4 py-2'>${entry.name}</td>;
-    const emailCell=<td class='border px-4 py-2'>${entry.email}</td>;
-    const passwordCell=<td class='border px-4 py-2'>${entry.password}</td>;
-    const dobCell=<td class='border px-4 py-2'>${entry.dob}</td>;
-    const acceptTermsCell=<td class='border px-4 py-2'>${entry.acceptedTermsAndconditions}</td>;
-    const row=<tr>${nameCell} ${emailCell} ${passwordCell} ${dobCell} ${acceptTermsCell}</tr>;
+    }
+    else{
+        userDataTable.classList.add('hidden');
+
+    }
+}
+function createUserDataTableRow(userData){
+    const row=document.createElement('tr');
+    row.innerHTML=`
+    <td>${userData.name}</td>
+    <td>${userData.email}</td>
+    <td>${userData.password}</td>
+    <td>${userData.dob}</td>
+    <td>${userData.terms ? 'true' : 'false'}</td>
+    `;
     return row;
-}).join("\n");
-const table=<table class="table-auto w-full">
-    <tr>
-       <th class="px-4 py-2">Name</th>
-       <th class="px-4 py-2">Email</th>
-       <th class="px-4 py-2">Password</th>
-       <th class="px-4 py-2">dob</th>
-       <th class="px-4 py-2">accepted terms</th>
-    </tr>${tableEntries}
-</table>;
-let details=document.getElementById("user-entries");
-details.innerHTML=table;
 }
-const saveUserForm =(event) => {
-event. preventDefault();
-const name = document.getElementById("name").value;
-const email = document.getElementById("email").value;
-const password = document.getElementById("password").value;
-const dob = document.getElementById("dob").value;
-
-const acceptedTermsAndconditions = document.getElementById("acceptTerms").checked;
-
-const entry ={
-name,
-email,
-password,
-dob,
-acceptedTermsAndconditions
-};
-userEntries.push(entry);
-localStorage.setItem("user-entries", JSON.stringify(userEntries));
-
-displayEntries();
-
+function clearForm(){
+    registrationForm.reset();
 }
-userForm.addEventListener("submit", saveUserForm);
-displayEntries();
